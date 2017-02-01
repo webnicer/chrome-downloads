@@ -1,0 +1,27 @@
+#!/bin/bash
+
+package_downloaded="google-chrome-stable_current_amd64.deb"
+wget https://dl.google.com/linux/direct/${package_downloaded}
+
+if [ $? != 0 ]; then
+  echo "Download failed, aborting."
+  exit
+fi
+
+version=`dpkg-deb --info ${package_downloaded} | grep Version | awk '{print $2}'`
+architecture=`dpkg-deb --info ${package_downloaded} | grep Architecture | awk '{print $2}'`
+package_canonical="google-chrome-stable_${version}_${architecture}.deb"
+ls -1 x64.deb/${package_canonical} >& /dev/null
+is_downloaded=$?
+
+if [ $is_downloaded = 0 ];then
+  rm ${package_downloaded}
+  echo `date -Iseconds` "Google Chrome ${version} has been already downloaded. Nothing to do."
+else
+  mv ${package_downloaded} x64.deb/${package_canonical}
+  git pull
+  git add x64.deb/${package_canonical}
+  git commit -m "Add Chrome x64 ${version}."
+  git push
+fi
+
