@@ -23,5 +23,7 @@ else
   git add x64.deb/${package_canonical}
   git commit -m "Add Chrome x64 ${version}."
   git push
+  cd x64.deb  
+  rm $(ls -1|grep -v "${package_canonical}")
 fi
 
